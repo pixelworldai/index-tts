@@ -32,10 +32,10 @@ tokenizers==0.21.0
 tqdm>=4.67.1
 transformers==4.52.1
 
-# PyTorch with CUDA 12.8 support
---extra-index-url https://download.pytorch.org/whl/cu128
-torch==2.8.*
-torchaudio==2.8.*
+# PyTorch with CUDA 12.1 support
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.5.1
+torchaudio==2.5.1
 
 # Text processing (Linux version for Docker)
 WeTextProcessing; sys_platform == 'linux'

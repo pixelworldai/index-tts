@@ -1,7 +1,7 @@
 # IndexTTS2 RunPod Serverless Dockerfile
 # Optimized for 24GB VRAM GPUs (RTX 4090, L4, A5000)
 
-FROM nvidia/cuda:12.8.0-base-ubuntu22.04
+FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04
 
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -39,9 +39,9 @@ COPY requirements.txt /workspace/requirements.txt
 # Install Python dependencies
 # Install PyTorch with CUDA support first
 RUN pip install --no-cache-dir \
-    torch==2.8.* \
-    torchaudio==2.8.* \
-    --extra-index-url https://download.pytorch.org/whl/cu128
+    torch==2.5.1 \
+    torchaudio==2.5.1 \
+    --extra-index-url https://download.pytorch.org/whl/cu121
 
 # Install remaining dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -57,9 +57,9 @@ RUN pip install --no-cache-dir "huggingface-hub[cli,hf_xet]" && \
     huggingface-cli download IndexTeam/IndexTTS-2 --local-dir /workspace/checkpoints
 
 # Verify critical files exist
-RUN test -f /workspace/irish_voice.wav || echo "Warning: irish_voice.wav not found" && \
-    test -f /workspace/checkpoints/config.yaml || echo "Error: config.yaml not found" && \
-    test -f /workspace/rp_handler.py || echo "Error: rp_handler.py not found"
+RUN ls -la /workspace/irish_voice.wav && \
+    ls -la /workspace/checkpoints/config.yaml && \
+    ls -la /workspace/rp_handler.py
 
 # Pre-download small models that get auto-downloaded on first run
 # This prevents cold start delays
