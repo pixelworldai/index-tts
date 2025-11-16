@@ -1,73 +1,100 @@
 # IndexTTS2 RunPod Serverless Dockerfile
-# Optimized for 24GB VRAM GPUs (RTX 4090, L4, A5000)
+# Using RunPod's official PyTorch base image
 
-FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04
+FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04
 
-# Prevent interactive prompts during package installation
+# Prevent interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
-ENV HF_HUB_CACHE=/workspace/checkpoints/hf_cache
+
+# Set working directory
+WORKDIR /workspace
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3-pip \
-    python3.10-dev \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     git-lfs \
     ffmpeg \
     libsndfile1 \
     libsndfile1-dev \
     build-essential \
-    wget \
-    curl \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Python 3.10 as default
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1
-
-# Upgrade pip
-RUN python3 -m pip install --upgrade pip setuptools wheel
-
-# Set working directory
-WORKDIR /workspace
-
-# Copy requirements first (for better layer caching)
+# Copy requirements first (for caching)
 COPY requirements.txt /workspace/requirements.txt
 
-# Install Python dependencies
-# Install PyTorch with CUDA support first
+# Upgrade pip
+RUN pip install --upgrade pip setuptools wheel
+
+# Install RunPod SDK first
+RUN pip install --no-cache-dir runpod
+
+# Install core dependencies (without torch since it's in base image)
 RUN pip install --no-cache-dir \
-    torch==2.5.1 \
-    torchaudio==2.5.1 \
-    --extra-index-url https://download.pytorch.org/whl/cu121
+    accelerate==1.8.1 \
+    cn2an==0.5.22 \
+    einops>=0.8.1 \
+    librosa==0.10.2.post1 \
+    omegaconf>=2.3.0 \
+    transformers==4.52.1 \
+    torchaudio \
+    safetensors==0.5.2 \
+    sentencepiece>=0.2.1
 
 # Install remaining dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir \
+    cython==3.0.7 \
+    descript-audiotools==0.7.2 \
+    ffmpeg-python==0.2.0 \
+    g2p-en==2.1.0 \
+    jieba==0.42.1 \
+    json5==0.10.0 \
+    keras==2.9.0 \
+    matplotlib==3.8.2 \
+    modelscope==1.27.0 \
+    munch==4.0.0 \
+    numba==0.58.1 \
+    numpy==1.26.2 \
+    opencv-python==4.9.0.80 \
+    pandas==2.3.2 \
+    tensorboard==2.9.1 \
+    textstat>=0.7.10 \
+    tokenizers==0.21.0 \
+    tqdm>=4.67.1 \
+    WeTextProcessing
 
 # Copy application code
 COPY . /workspace/
 
-# Install the indextts package in editable mode
+# Install indextts package
 RUN pip install --no-cache-dir -e .
 
-# Download IndexTTS-2 model checkpoints from HuggingFace
-RUN pip install --no-cache-dir "huggingface-hub[cli,hf_xet]" && \
-    huggingface-cli download IndexTeam/IndexTTS-2 --local-dir /workspace/checkpoints
+# Create checkpoints directory
+RUN mkdir -p /workspace/checkpoints
 
-# Verify critical files exist
-RUN ls -la /workspace/irish_voice.wav && \
-    ls -la /workspace/checkpoints/config.yaml && \
-    ls -la /workspace/rp_handler.py
+# Download model checkpoints using huggingface-cli
+RUN pip install --no-cache-dir "huggingface-hub[cli]" && \
+    huggingface-cli download IndexTeam/IndexTTS-2 --local-dir /workspace/checkpoints && \
+    echo "Model download complete"
 
-# Pre-download small models that get auto-downloaded on first run
-# This prevents cold start delays
-RUN python3 -c "from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('Qwen/Qwen2.5-0.5B-Instruct')" || true
+# Verify critical files
+RUN echo "Verifying files..." && \
+    ls -lh /workspace/irish_voice.wav && \
+    ls -lh /workspace/checkpoints/config.yaml && \
+    ls -lh /workspace/rp_handler.py && \
+    echo "All files verified!"
 
-# Set cache directories
-ENV TRANSFORMERS_CACHE=/workspace/checkpoints/hf_cache
+# Set environment variables
 ENV HF_HOME=/workspace/checkpoints/hf_cache
+ENV TRANSFORMERS_CACHE=/workspace/checkpoints/hf_cache
+
+# Pre-download Qwen tokenizer (optional, prevents first-run delay)
+RUN python3 -c "from transformers import AutoTokenizer; AutoTokenizer.from_pretrained('Qwen/Qwen2.5-0.5B-Instruct')" || echo "Qwen download skipped"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python3 -c "import runpod; print('OK')" || exit 1
 
 # RunPod serverless entry point
 CMD ["python3", "-u", "rp_handler.py"]
