@@ -1,0 +1,93 @@
+# Git and version control
+.git/
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.tox/
+htmlcov/
+.mypy_cache/
+.hypothesis/
+
+# Documentation (not needed in Docker)
+*.md
+!README_RUNPOD.md
+docs/
+
+# Development outputs
+outputs/
+gen*.wav
+test*.wav
+*.log
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Model checkpoints (will be downloaded in Docker build)
+# Commenting out since we download in Dockerfile
+# checkpoints/
+
+# Large example files (only keep necessary reference audio)
+# We keep irish_voice.wav as it's the default reference
+examples/*
+!examples/voice_*.wav
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# OS-specific
+Thumbs.db
+.DS_Store
+
+# RunPod deployment files (keep these)
+!rp_handler.py
+!Dockerfile
+!requirements.txt
+!.dockerignore
+
+# CI/CD and GitHub
+.github/
+.gitlab-ci.yml
+
+# UV package manager cache
+.uv/
+uv.lock
+
+# Other unnecessary files
+*.tar.gz
+*.zip
+*.rar
+*.7z
+RUNPOD_DEPLOYMENT_PLAN.md
+runpod_serverless_docs.txt

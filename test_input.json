@@ -1,0 +1,182 @@
+{
+  "examples": [
+    {
+      "name": "Basic calm speech",
+      "description": "Simple neutral speech with default Irish voice",
+      "input": {
+        "text": "They call it Quad HD or QHD, and yep, it's way sharper than your basic 1080p.",
+        "emotion": "calm",
+        "intensity": 0.5
+      }
+    },
+    {
+      "name": "Happy excitement",
+      "description": "Joyful, cheerful expression with high intensity",
+      "input": {
+        "text": "Oh wow! This is absolutely incredible! I can't believe how amazing this is!",
+        "emotion": "happy",
+        "intensity": 0.9
+      }
+    },
+    {
+      "name": "Angry complaint",
+      "description": "Forceful, intense angry expression",
+      "input": {
+        "text": "This is completely unacceptable! I demand to speak with a manager immediately!",
+        "emotion": "angry",
+        "intensity": 0.7
+      }
+    },
+    {
+      "name": "Sad reflection",
+      "description": "Sorrowful, melancholic tone",
+      "input": {
+        "text": "I can't believe it's over. Everything we worked for, all those years, just gone.",
+        "emotion": "sad",
+        "intensity": 0.6
+      }
+    },
+    {
+      "name": "Fearful warning",
+      "description": "Anxious, fearful expression",
+      "input": {
+        "text": "Quick, hide! Someone's coming! We need to get out of here right now!",
+        "emotion": "afraid",
+        "intensity": 0.8
+      }
+    },
+    {
+      "name": "Disgusted reaction",
+      "description": "Repulsed, distasteful expression",
+      "input": {
+        "text": "Ugh, that's absolutely revolting! I can't even look at it!",
+        "emotion": "disgusted",
+        "intensity": 0.7
+      }
+    },
+    {
+      "name": "Melancholic mood",
+      "description": "Low, depressed expression",
+      "input": {
+        "text": "Nothing seems to matter anymore. Every day is just the same empty routine.",
+        "emotion": "melancholic",
+        "intensity": 0.6
+      }
+    },
+    {
+      "name": "Surprised amazement",
+      "description": "Shocked, amazed expression",
+      "input": {
+        "text": "What?! No way! Are you serious? That's impossible!",
+        "emotion": "surprised",
+        "intensity": 0.85
+      }
+    },
+    {
+      "name": "Professional narration",
+      "description": "Calm, neutral professional tone - low intensity",
+      "input": {
+        "text": "The quarterly earnings report shows a twelve percent increase in revenue compared to the previous fiscal year.",
+        "emotion": "calm",
+        "intensity": 0.3
+      }
+    },
+    {
+      "name": "Subtle happiness",
+      "description": "Gentle, subtle happy tone - low intensity",
+      "input": {
+        "text": "It's a beautiful morning. The sun is shining and everything feels just right.",
+        "emotion": "happy",
+        "intensity": 0.4
+      }
+    },
+    {
+      "name": "Long text example",
+      "description": "Testing with longer text content",
+      "input": {
+        "text": "Artificial intelligence has revolutionized the way we interact with technology. From voice assistants to autonomous vehicles, AI is transforming every aspect of our daily lives. The rapid advancement in machine learning and natural language processing has opened up possibilities that were once confined to science fiction. As we move forward, it's crucial to consider both the tremendous benefits and the ethical implications of these powerful technologies.",
+        "emotion": "calm",
+        "intensity": 0.5
+      }
+    },
+    {
+      "name": "Minimum intensity",
+      "description": "Testing minimum allowed intensity value",
+      "input": {
+        "text": "This is a test with minimum emotion intensity.",
+        "emotion": "happy",
+        "intensity": 0.1
+      }
+    },
+    {
+      "name": "Maximum intensity",
+      "description": "Testing maximum allowed intensity value",
+      "input": {
+        "text": "This is a test with maximum emotion intensity!",
+        "emotion": "surprised",
+        "intensity": 1.0
+      }
+    }
+  ],
+
+  "error_test_cases": [
+    {
+      "name": "Invalid emotion",
+      "description": "Should return error: unsupported emotion name",
+      "input": {
+        "text": "This should fail.",
+        "emotion": "excited",
+        "intensity": 0.5
+      },
+      "expected_error": "Invalid emotion 'excited'"
+    },
+    {
+      "name": "Missing text",
+      "description": "Should return error: missing required parameter",
+      "input": {
+        "emotion": "calm",
+        "intensity": 0.5
+      },
+      "expected_error": "Missing required parameter: 'text'"
+    },
+    {
+      "name": "Empty text",
+      "description": "Should return error: empty text",
+      "input": {
+        "text": "",
+        "emotion": "calm",
+        "intensity": 0.5
+      },
+      "expected_error": "must be a non-empty string"
+    },
+    {
+      "name": "Intensity too high (auto-clamped)",
+      "description": "Should clamp to 1.0 automatically",
+      "input": {
+        "text": "Testing intensity clamping.",
+        "emotion": "calm",
+        "intensity": 1.5
+      },
+      "expected_behavior": "Intensity clamped to 1.0"
+    },
+    {
+      "name": "Intensity too low (auto-clamped)",
+      "description": "Should clamp to 0.1 automatically",
+      "input": {
+        "text": "Testing intensity clamping.",
+        "emotion": "calm",
+        "intensity": 0.0
+      },
+      "expected_behavior": "Intensity clamped to 0.1"
+    }
+  ],
+
+  "quick_test": {
+    "description": "Simple test for quick verification",
+    "input": {
+      "text": "Hello world! This is a test.",
+      "emotion": "calm",
+      "intensity": 0.5
+    }
+  }
+}
