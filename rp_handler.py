@@ -40,6 +40,22 @@ class IndexTTSHandler:
         """Initialize the IndexTTS2 model"""
         print(">> Initializing IndexTTS2 model...")
 
+        # Check if model needs to be downloaded
+        if not os.path.exists("checkpoints/config.yaml"):
+            print(">> Model not found, downloading from HuggingFace...")
+            print(">> This will take a few minutes on first run...")
+            try:
+                import subprocess
+                subprocess.run([
+                    "huggingface-cli", "download",
+                    "IndexTeam/IndexTTS-2",
+                    "--local-dir", "checkpoints"
+                ], check=True)
+                print(">> Model download complete!")
+            except Exception as e:
+                print(f">> ERROR: Model download failed: {e}")
+                raise
+
         # Determine device
         if torch.cuda.is_available():
             self.device = "cuda:0"

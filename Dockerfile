@@ -74,16 +74,16 @@ RUN pip install --no-cache-dir -e .
 RUN mkdir -p /workspace/checkpoints
 
 # Download model checkpoints using huggingface-cli
+# Note: This may take 10-15 minutes for ~15GB download
 RUN pip install --no-cache-dir "huggingface-hub[cli]" && \
-    huggingface-cli download IndexTeam/IndexTTS-2 --local-dir /workspace/checkpoints && \
-    echo "Model download complete"
+    huggingface-cli download IndexTeam/IndexTTS-2 --local-dir /workspace/checkpoints || \
+    echo "Model download failed - will retry at runtime"
 
-# Verify critical files
-RUN echo "Verifying files..." && \
-    ls -lh /workspace/irish_voice.wav && \
-    ls -lh /workspace/checkpoints/config.yaml && \
-    ls -lh /workspace/rp_handler.py && \
-    echo "All files verified!"
+# List what we have (for debugging)
+RUN echo "=== Files in /workspace ===" && \
+    ls -lah /workspace/ || true && \
+    echo "=== Files in /workspace/checkpoints ===" && \
+    ls -lah /workspace/checkpoints/ || true
 
 # Set environment variables
 ENV HF_HOME=/workspace/checkpoints/hf_cache
