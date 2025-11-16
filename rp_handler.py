@@ -73,7 +73,7 @@ class IndexTTSHandler:
             device=self.device,
             use_cuda_kernel=True if self.device.startswith("cuda") else False,
             use_deepspeed=False,  # Not needed for 24GB VRAM
-            use_accel=True,  # Enable acceleration
+            use_accel=False,  # Disabled (requires flash_attn which is hard to install)
             use_torch_compile=False  # Disabled for compatibility
         )
 
